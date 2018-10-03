@@ -1,0 +1,47 @@
+
+Public Sub ListaProjetos()
+    Dim diretorio As String
+    Dim extencaoArquivo As String
+    Dim ultimaLinha As String
+    Dim projeto As String
+
+    '---Diretorio do arquivo onde tem a lista de projetos
+    diretorio = "\\lua\qualidade\_indicadores\Indicadores Power BI\Tabela Fato - Power BI"
+    extencaoArquivo = ".xlsx"
+
+    '---Abre o arquivo e selecioana a ABA dos projetos
+    Workbooks.Open diretorio & extencaoArquivo
+    Worksheets("Projetos no PWA").Activate
+    Range("A1").Select
+      
+    '---Conta a quantidade de projetos existentes na ABA
+    ultimaLinha = Cells(Rows.Count, 1).End(xlUp).Row
+    
+    '---Passa por todos os projetos, e envia o nome para ser salvo na pasta
+    For i = 2 To ultimaLinha
+        projeto = Range("A" & i).Value
+        Call BackupCronogramas(projeto)
+        Range("B" & i).Value = 1
+        ActiveWorkbook.Save
+    Next i
+    
+    '---Fecha a planilha e salva as alterações
+    Workbooks("Tabela Fato - Power BI.xlsx").Close SaveChanges:=True
+End Sub
+
+Private Sub BackupCronogramas(projectName As String)
+Dim projeto As String
+    
+    '---Nome da variavel no nome do Projeto
+    projeto = projectName
+    
+    '---Abre o cronograma
+    FileOpenEx name:="<>\" + projeto, ReadOnly:=True
+    
+    '---Salva uma copia do cronograma no caminho indicado
+    FileSaveAs name:="C:\Users\TEMP.BH\Desktop\backup\" + projeto + ".mpp", FormatID:="MSProject.MPP"
+    
+    '---Fecha o arquivo
+    FileCloseEx Save:=pjDoNotSave
+End Sub
+
